@@ -3,26 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZENITH - Puntos y Canjes</title>
+    <title>Puntos y Canjes - Comunidad</title>
     <style>
-        body { background: #fff; color: #000; font-family: monospace, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
-        .box { border: 1px solid #001240; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        h2 { border-bottom: 2px solid #001240; padding-bottom: 8px; color: #001240; font-size: 1.2rem; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #e5e7eb; font-size: 0.9rem; }
-        th { color: #001240; }
-        input, button { width: 100%; padding: 10px; margin-top: 8px; background: #fff; border: 1px solid #001240; color: #000; border-radius: 5px; box-sizing: border-box; font-family: monospace; }
-        button { background: #001240; color: #fff; cursor: pointer; border: none; font-weight: bold; }
-        button:hover { background: #002270; }
-        .admin-panel { display: none; background: #f9fafb; border-color: #ff0055; margin-top: 20px; }
-        .admin-panel h2 { color: #ff0055; border-color: #ff0055; }
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: monospace, sans-serif;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+        }
+        h2 {
+            border-bottom: 2px solid #001240;
+            padding-bottom: 8px;
+            color: #001240;
+            font-size: 1.2rem;
+        }
+        .box {
+            background: #ffffff;
+            border: 1px solid #001240;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        label {
+            color: #001240;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: #ffffff;
+            border: 1px solid #001240;
+            color: #000000;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #001240;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+            color: #000000;
+        }
+        th {
+            color: #001240;
+        }
+        button {
+            background: #001240;
+            color: #ffffff;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background: #002270;
+        }
+        #mensaje-copiado {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #001240;
+            text-align: center;
+        }
+        /* Estilo exacto del panel de la imagen */
+        .admin-panel {
+            display: none;
+            border-color: #ff0055;
+            background: #fff;
+        }
+        .admin-panel h2 {
+            color: #ff0055;
+            border-color: #ff0055;
+        }
+        .admin-panel input, .admin-panel button {
+            border-color: #ff0055;
+        }
+        .admin-panel button.btn-eliminar {
+            background: #ff0055;
+            color: #ffffff;
+        }
+        .admin-panel button.btn-accion {
+            background: #001240;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
 
-    <!-- VISTA NORMAL: LISTA DE PUNTOS -->
+    <!-- ZONA 1: TABLA DE PUNTOS CON BUSCADOR -->
     <div class="box">
-        <h2>LISTA PUNTOS ZENITH</h2>
+        <h2>LISTA PUNTOS</h2>
+        <!-- Si escribes #J aquí, se abre automáticamente el panel de admin -->
+        <input type="text" id="buscador" placeholder="Buscar usuario..." onkeyup="verificarOwnerYFiltrar()">
+        
         <table id="tabla-usuarios">
             <thead>
                 <tr>
@@ -34,33 +118,47 @@
                 <tr><td colspan="2">Cargando puntos...</td></tr>
             </tbody>
         </table>
-        
-        <!-- Botón discreto para activar el panel con contraseña -->
-        <button onclick="pedirAcceso()" style="background: transparent; color: #666; border: 1px dashed #ccc; font-size: 0.7rem; margin-top: 20px;">Modo Owner</button>
     </div>
 
-    <!-- PANEL DE ADMINISTRACIÓN OCULTO -->
+    <!-- PANEL OWNER (Oculto hasta que escribas #J en el buscador) -->
     <div class="box admin-panel" id="panelAdmin">
         <h2>PANEL OWNER</h2>
-        <p style="font-size: 0.8rem;">Gestionando datos internos:</p>
+        <p style="font-size: 0.85rem; margin-top:5px;">Gestionando datos internos:</p>
         
-        <label>Modificar Usuario Existente:</label>
+        <p style="font-weight: bold; margin-top:15px; font-size:0.9rem;">Modificar Usuario Existente:</p>
         <input type="text" id="targetUser" placeholder="Usuario exacto (ej: @usuario_activo)">
         <input type="text" id="nuevoNombre" placeholder="Nuevo nombre (opcional)">
         <input type="number" id="nuevosPuntos" placeholder="Nuevos puntos (opcional)">
-        <button onclick="ejecutar('editar')">Actualizar Datos</button>
-        <button onclick="ejecutar('eliminar')" style="background:#ff0055; margin-top:5px;">Eliminar Usuario</button>
+        <button class="btn-accion" onclick="ejecutar('editar')">Actualizar Datos</button>
+        <button class="btn-eliminar" onclick="ejecutar('eliminar')">Eliminar Usuario</button>
 
-        <hr style="border: 0; border-top: 1px solid #ddd; margin: 15px 0;">
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
 
-        <label>Agregar Nuevo Usuario:</label>
+        <p style="font-weight: bold; font-size:0.9rem;">Agregar Nuevo Usuario:</p>
         <input type="text" id="addNombre" placeholder="Nombre de usuario">
         <input type="number" id="addPuntos" placeholder="Puntos iniciales">
-        <button onclick="ejecutar('agregar')">Crear Usuario</button>
+        <button class="btn-accion" onclick="ejecutar('agregar')">Crear Usuario</button>
+    </div>
+
+    <!-- ZONA 2: ZONA DE CANJE -->
+    <div class="box">
+        <h2>ZONA DE CANJE</h2>
+        <label for="usuario">Tu usuario:</label>
+        <input type="text" id="usuario" placeholder="Escribe tu nombre aquí...">
+
+        <label for="select" style="display:block; margin-top:10px;">Selecciona canje:</label>
+        <select id="select">
+            <option value="Promoción de arte (100 Pts)">Promoción de arte - 100 Pts</option>
+            <option value="Quitar 1 advertencia (250 Pts)">Quitar 1 advertencia - 250 Pts</option>
+            <option value="Quitar 2 advertencias (470 Pts)">Quitar 2 advertencia - 470 Pts</option>
+        </select>
+
+        <button onclick="generarYEnviarCanje()">Canjear y Enviar al Owner</button>
+        <div id="mensaje-copiado"></div>
     </div>
 
     <script>
-        let passwordGlobal = "";
+        let listaGlobalUsuarios = [];
 
         window.onload = function() {
             cargarPuntos();
@@ -70,37 +168,50 @@
             fetch('/api/puntos')
                 .then(res => res.json())
                 .then(data => {
-                    let cuerpoTabla = document.getElementById('cuerpo-tabla');
-                    cuerpoTabla.innerHTML = '';
-                    data.forEach(item => {
-                        cuerpoTabla.innerHTML += `<tr><td>${item.usuario}</td><td>${item.puntos}</td></tr>`;
-                    });
+                    listaGlobalUsuarios = data;
+                    mostrarTabla(data);
                 })
                 .catch(err => {
                     document.getElementById('cuerpo-tabla').innerHTML = '<tr><td colspan="2">Error al cargar datos</td></tr>';
                 });
         }
 
-        function pedirAcceso() {
-            let pass = prompt("Introduce la contraseña de Owner:");
-            if (pass === "#J") {
-                passwordGlobal = pass;
-                document.getElementById('panelAdmin').style.display = "block";
-                alert("¡Acceso concedido! Panel abierto abajo.");
-            } else if (pass !== null) {
-                alert("Contraseña incorrecta.");
+        function mostrarTabla(datos) {
+            let cuerpoTabla = document.getElementById('cuerpo-tabla');
+            cuerpoTabla.innerHTML = '';
+            if(datos.length === 0) {
+                cuerpoTabla.innerHTML = '<tr><td colspan="2">No hay usuarios registrados</td></tr>';
+                return;
             }
+            datos.forEach(item => {
+                cuerpoTabla.innerHTML += `<tr><td>${item.usuario}</td><td>${item.puntos}</td></tr>`;
+            });
+        }
+
+        function verificarOwnerYFiltrar() {
+            let textoBuscador = document.getElementById('buscador').value;
+
+            // TRUCO: Si escribes exactamente #J en el buscador, se abre el panel de la imagen
+            if (textoBuscador === "#J") {
+                document.getElementById('panelAdmin').style.display = "block";
+                return;
+            }
+
+            // Filtrado normal de la tabla de puntos
+            let filtro = textoBuscador.toLowerCase();
+            let filtrados = listaGlobalUsuarios.filter(u => u.usuario.toLowerCase().includes(filtro));
+            mostrarTabla(filtrados);
         }
 
         function ejecutar(accion) {
-            let targetUser = document.getElementById('targetUser').value;
-            let nuevoNombre = document.getElementById('nuevoNombre').value;
+            let targetUser = document.getElementById('targetUser').value.trim();
+            let nuevoNombre = document.getElementById('nuevoNombre').value.trim();
             let nuevosPuntos = document.getElementById('nuevosPuntos').value;
             
-            let addNombre = document.getElementById('addNombre').value;
+            let addNombre = document.getElementById('addNombre').value.trim();
             let addPuntos = document.getElementById('addPuntos').value;
 
-            let datos = { password: passwordGlobal, accion };
+            let datos = { password: "#J", accion };
 
             if(accion === 'agregar') {
                 datos.nuevoNombre = addNombre;
@@ -121,15 +232,37 @@
                 if(data.error) {
                     alert("Error: " + data.error);
                 } else {
-                    alert("¡Modificación aplicada con éxito!");
-                    cargarPuntos();
+                    alert("¡Acción aplicada con éxito!");
+                    document.getElementById('buscador').value = "";
                     document.getElementById('targetUser').value = "";
                     document.getElementById('nuevoNombre').value = "";
                     document.getElementById('nuevosPuntos').value = "";
                     document.getElementById('addNombre').value = "";
                     document.getElementById('addPuntos').value = "";
+                    cargarPuntos();
                 }
             });
+        }
+
+        function generarYEnviarCanje() {
+            let usuario = document.getElementById('usuario').value.trim();
+            let premioSeleccionado = document.getElementById('select').value;
+            let aviso = document.getElementById('mensaje-copiado');
+
+            if (usuario === "") {
+                alert("Por favor, escribe tu usuario antes de canjear.");
+                return;
+            }
+
+            let textoMensaje = `Hola Owner, soy *${usuario}* y quiero canjear mis puntos por: *${premioSeleccionado}*.`;
+            let numeroOwner = "TU_NUMERO_DE_TELEFONO"; // Cámbialo por tu número de WhatsApp
+            let urlWhatsApp = `https://wa.me/${numeroOwner}?text=` + encodeURIComponent(textoMensaje);
+
+            aviso.innerText = "¡Redirigiendo a WhatsApp con tu solicitud!";
+            
+            setTimeout(() => {
+                window.location.href = urlWhatsApp;
+            }, 500);
         }
     </script>
 
