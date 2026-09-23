@@ -76,26 +76,31 @@
             color: #001240;
             text-align: center;
         }
-        /* Estilo exacto del panel de la imagen */
+        /* Estilo del panel owner unificado en azul y blanco */
         .admin-panel {
             display: none;
-            border-color: #ff0055;
+            border-color: #001240;
             background: #fff;
         }
         .admin-panel h2 {
-            color: #ff0055;
-            border-color: #ff0055;
+            color: #001240;
+            border-color: #001240;
         }
-        .admin-panel input, .admin-panel button {
-            border-color: #ff0055;
-        }
-        .admin-panel button.btn-eliminar {
-            background: #ff0055;
-            color: #ffffff;
+        .admin-panel input {
+            border-color: #001240;
         }
         .admin-panel button.btn-accion {
             background: #001240;
             color: #ffffff;
+        }
+        .admin-panel button.btn-eliminar {
+            background: #ffffff;
+            color: #001240;
+            border: 1px solid #001240;
+            font-weight: bold;
+        }
+        .admin-panel button.btn-eliminar:hover {
+            background: #f0f4ff;
         }
     </style>
 </head>
@@ -104,7 +109,7 @@
     <!-- ZONA 1: TABLA DE PUNTOS CON BUSCADOR -->
     <div class="box">
         <h2>LISTA PUNTOS</h2>
-        <!-- Si escribes #J aquí, se abre automáticamente el panel de admin -->
+        <!-- Escribe #J aquí para abrir el panel de owner -->
         <input type="text" id="buscador" placeholder="Buscar usuario..." onkeyup="verificarOwnerYFiltrar()">
         
         <table id="tabla-usuarios">
@@ -120,21 +125,21 @@
         </table>
     </div>
 
-    <!-- PANEL OWNER (Oculto hasta que escribas #J en el buscador) -->
+    <!-- PANEL OWNER (Oculto hasta escribir #J en el buscador) -->
     <div class="box admin-panel" id="panelAdmin">
         <h2>PANEL OWNER</h2>
-        <p style="font-size: 0.85rem; margin-top:5px;">Gestionando datos internos:</p>
+        <p style="font-size: 0.85rem; margin-top:5px; color: #001240;">Gestionando datos internos:</p>
         
-        <p style="font-weight: bold; margin-top:15px; font-size:0.9rem;">Modificar Usuario Existente:</p>
+        <p style="font-weight: bold; margin-top:15px; font-size:0.9rem; color: #001240;">Modificar Usuario Existente:</p>
         <input type="text" id="targetUser" placeholder="Usuario exacto (ej: @usuario_activo)">
         <input type="text" id="nuevoNombre" placeholder="Nuevo nombre (opcional)">
         <input type="number" id="nuevosPuntos" placeholder="Nuevos puntos (opcional)">
         <button class="btn-accion" onclick="ejecutar('editar')">Actualizar Datos</button>
         <button class="btn-eliminar" onclick="ejecutar('eliminar')">Eliminar Usuario</button>
 
-        <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+        <hr style="border: 0; border-top: 1px solid #001240; margin: 20px 0;">
 
-        <p style="font-weight: bold; font-size:0.9rem;">Agregar Nuevo Usuario:</p>
+        <p style="font-weight: bold; font-size:0.9rem; color: #001240;">Agregar Nuevo Usuario:</p>
         <input type="text" id="addNombre" placeholder="Nombre de usuario">
         <input type="number" id="addPuntos" placeholder="Puntos iniciales">
         <button class="btn-accion" onclick="ejecutar('agregar')">Crear Usuario</button>
@@ -191,13 +196,11 @@
         function verificarOwnerYFiltrar() {
             let textoBuscador = document.getElementById('buscador').value;
 
-            // TRUCO: Si escribes exactamente #J en el buscador, se abre el panel de la imagen
             if (textoBuscador === "#J") {
                 document.getElementById('panelAdmin').style.display = "block";
                 return;
             }
 
-            // Filtrado normal de la tabla de puntos
             let filtro = textoBuscador.toLowerCase();
             let filtrados = listaGlobalUsuarios.filter(u => u.usuario.toLowerCase().includes(filtro));
             mostrarTabla(filtrados);
@@ -255,7 +258,7 @@
             }
 
             let textoMensaje = `Hola Owner, soy *${usuario}* y quiero canjear mis puntos por: *${premioSeleccionado}*.`;
-            let numeroOwner = "TU_NUMERO_DE_TELEFONO"; // Cámbialo por tu número de WhatsApp
+            let numeroOwner = "TU_NUMERO_DE_TELEFONO"; // Recuerda poner tu número aquí
             let urlWhatsApp = `https://wa.me/${numeroOwner}?text=` + encodeURIComponent(textoMensaje);
 
             aviso.innerText = "¡Redirigiendo a WhatsApp con tu solicitud!";
