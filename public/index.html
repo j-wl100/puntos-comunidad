@@ -115,6 +115,25 @@
         <div id="mensaje-copiado"></div>
     </div>
 
+
+    <!-- ========================================================= -->
+    <!-- ⬇️ ZONA DE PRUEBAS: JUEGO PRUEBA (BORRAR DESDE AQUÍ ABAJO SI NO LO QUIERES) ⬇️ -->
+    <!-- ========================================================= -->
+    <div class="box" style="text-align: center; border-color: #ff0055;">
+        <h2 style="color: #ff0055; border-color: #ff0055;">ZONA JUEGO PRUEBA (SHOOTER 2D)</h2>
+        <p style="font-size: 0.8rem;">Usa los botones o flechas para moverte y disparar.</p>
+        <canvas id="gameCanvas" width="300" height="350" style="background:#111; border:1px solid #ff0055; max-width:100%;"></canvas>
+        <div style="margin-top: 10px;">
+            <button onclick="moverIzq()" style="width: 45%; display:inline-block; background:#ff0055;">Izquierda</button>
+            <button onclick="disparar()" style="width: 45%; display:inline-block; background:#ff0055;">Disparar</button>
+            <button onclick="moverDer()" style="width: 92%; margin-top:5px; background:#ff0055;">Derecha</button>
+        </div>
+    </div>
+    <!-- ========================================================= -->
+    <!-- ⬆️ FIN DE LA ZONA DE PRUEBAS ⬆️ -->
+    <!-- ========================================================= -->
+
+
     <script>
         // Cargar los puntos automáticamente desde el servidor al abrir la web
         window.onload = function() {
@@ -171,6 +190,64 @@
                 window.location.href = urlWhatsApp;
             }, 500);
         }
+
+        // --- SCRIPTS DEL JUEGO PRUEBA ---
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let playerX = 130;
+        let bullets = [];
+        let enemies = [{x: 100, y: 20, width: 25, height: 25, speed: 1}];
+        let scoreJuego = 0;
+
+        function moverIzq() { if(playerX > 10) playerX -= 15; }
+        function moverDer() { if(playerX < canvas.width - 40) playerX += 15; }
+        function disparar() { bullets.push({x: playerX + 18, y: 300, width: 4, height: 10}); }
+
+        function actualizarJuego() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Jugador
+            ctx.fillStyle = "#001240";
+            ctx.fillRect(playerX, 310, 35, 15);
+
+            // Balas
+            ctx.fillStyle = "#ff0055";
+            bullets.forEach((b, index) => {
+                b.y -= 5;
+                ctx.fillRect(b.x, b.y, b.width, b.height);
+                if(b.y < 0) bullets.splice(index, 1);
+            });
+
+            // Enemigos
+            ctx.fillStyle = "#000";
+            enemies.forEach((e, eIndex) => {
+                e.y += e.speed;
+                ctx.fillRect(e.x, e.y, e.width, e.height);
+
+                // Colisión
+                bullets.forEach((b, bIndex) => {
+                    if(b.x < e.x + e.width && b.x + b.width > e.x && b.y < e.y + e.height && b.y + b.height > e.y) {
+                        enemies.splice(eIndex, 1);
+                        bullets.splice(bIndex, 1);
+                        scoreJuego += 10;
+                        // Respawnear enemigo
+                        enemies.push({x: Math.random() * 250, y: 0, width: 25, height: 25, speed: 1.2});
+                    }
+                });
+
+                if(e.y > canvas.height) e.y = 0;
+            });
+
+            // Texto Puntos Juego
+            ctx.fillStyle = "#001240";
+            ctx.font = "12px monospace";
+            ctx.fillText("Score MiniJuego: " + scoreJuego, 10, 20);
+
+            requestAnimationFrame(actualizarJuego);
+        }
+
+        actualizarJuego();
     </script>
 
 </body>
