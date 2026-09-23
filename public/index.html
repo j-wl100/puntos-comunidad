@@ -3,88 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puntos y Canjes - Comunidad</title>
+    <title>ZENITH - Puntos y Canjes</title>
     <style>
-        body {
-            background-color: #ffffff;
-            color: #000000;
-            font-family: monospace, sans-serif;
-            padding: 20px;
-            max-width: 500px;
-            margin: auto;
-        }
-        h2 {
-            border-bottom: 2px solid #001240;
-            padding-bottom: 8px;
-            color: #001240;
-            font-size: 1.2rem;
-        }
-        .box {
-            background: #ffffff;
-            border: 1px solid #001240;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        label {
-            color: #001240;
-            font-weight: bold;
-        }
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background: #ffffff;
-            border: 1px solid #001240;
-            color: #000000;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-family: monospace;
-            font-size: 0.9rem;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #001240;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            text-align: left;
-            padding: 8px;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 0.9rem;
-            color: #000000;
-        }
-        th {
-            color: #001240;
-        }
-        button {
-            background: #001240;
-            color: #ffffff;
-            cursor: pointer;
-            border: none;
-        }
-        button:hover {
-            background: #002270;
-        }
-        #mensaje-copiado {
-            margin-top: 10px;
-            font-size: 0.8rem;
-            color: #001240;
-            text-align: center;
-        }
+        body { background: #fff; color: #000; font-family: monospace, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+        .box { border: 1px solid #001240; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        h2 { border-bottom: 2px solid #001240; padding-bottom: 8px; color: #001240; font-size: 1.2rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #e5e7eb; font-size: 0.9rem; }
+        th { color: #001240; }
+        input, button { width: 100%; padding: 10px; margin-top: 8px; background: #fff; border: 1px solid #001240; color: #000; border-radius: 5px; box-sizing: border-box; font-family: monospace; }
+        button { background: #001240; color: #fff; cursor: pointer; border: none; font-weight: bold; }
+        button:hover { background: #002270; }
+        .admin-panel { display: none; background: #f9fafb; border-color: #ff0055; margin-top: 20px; }
+        .admin-panel h2 { color: #ff0055; border-color: #ff0055; }
     </style>
 </head>
 <body>
 
-    <!-- ZONA 1: TABLA DE PUNTOS CON BUSCADOR -->
+    <!-- VISTA NORMAL: LISTA DE PUNTOS -->
     <div class="box">
-        <h2>LISTA PUNTOS</h2>
-        <input type="text" id="buscador" placeholder="Buscar usuario..." onkeyup="filtrarTabla()">
-        
+        <h2>LISTA PUNTOS ZENITH</h2>
         <table id="tabla-usuarios">
             <thead>
                 <tr>
@@ -96,47 +34,39 @@
                 <tr><td colspan="2">Cargando puntos...</td></tr>
             </tbody>
         </table>
+        
+        <!-- Botón discreto para activar el modo admin -->
+        <button onclick="pedirAcceso()" style="background: transparent; color: #666; border: 1px dashed #ccc; font-size: 0.7rem; margin-top: 20px;">Modo Owner</button>
     </div>
 
-    <!-- ZONA 2: ZONA DE CANJE -->
-    <div class="box">
-        <h2>ZONA DE CANJE</h2>
-        <label for="usuario">Tu usuario:</label>
-        <input type="text" id="usuario" placeholder="Escribe tu nombre aquí...">
+    <!-- PANEL DE ADMINISTRACIÓN OCULTO (Se abre con #J) -->
+    <div class="box admin-panel" id="panelAdmin">
+        <h2>PANEL OWNER</h2>
+        <p style="font-size: 0.8rem;">Gestionando datos internos:</p>
+        
+        <label>Modificar Usuario Existente:</label>
+        <input type="text" id="targetUser" placeholder="Usuario exacto (ej: @usuario_activo)">
+        <input type="text" id="nuevoNombre" placeholder="Nuevo nombre (opcional)">
+        <input type="number" id="nuevosPuntos" placeholder="Nuevos puntos (opcional)">
+        <button onclick="ejecutar('editar')">Actualizar Datos</button>
+        <button onclick="ejecutar('eliminar')" style="background:#ff0055; margin-top:5px;">Eliminar Usuario</button>
 
-        <label for="select" style="display:block; margin-top:10px;">Selecciona canje:</label>
-        <select id="select">
-            <option value="Promoción de arte (100 Pts)">Promoción de arte - 100 Pts</option>
-            <option value="Quitar 1 advertencia (250 Pts)">Quitar 1 advertencia - 250 Pts</option>
-            <option value="Quitar 2 advertencias (470 Pts)">Quitar 2 advertencias - 470 Pts</option>
-        </select>
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 15px 0;">
 
-        <button onclick="generarYEnviarCanje()">Canjear y Enviar al Owner</button>
-        <div id="mensaje-copiado"></div>
+        <label>Agregar Nuevo Usuario:</label>
+        <input type="text" id="addNombre" placeholder="Nombre de usuario">
+        <input type="number" id="addPuntos" placeholder="Puntos iniciales">
+        <button onclick="ejecutar('agregar')">Crear Usuario</button>
     </div>
-
-
-    <!-- ========================================================= -->
-    <!-- ⬇️ ZONA DE PRUEBAS: JUEGO PRUEBA (BORRAR DESDE AQUÍ ABAJO SI NO LO QUIERES) ⬇️ -->
-    <!-- ========================================================= -->
-    <div class="box" style="text-align: center; border-color: #ff0055;">
-        <h2 style="color: #ff0055; border-color: #ff0055;">ZONA JUEGO PRUEBA (SHOOTER 2D)</h2>
-        <p style="font-size: 0.8rem;">Usa los botones o flechas para moverte y disparar.</p>
-        <canvas id="gameCanvas" width="300" height="350" style="background:#111; border:1px solid #ff0055; max-width:100%;"></canvas>
-        <div style="margin-top: 10px;">
-            <button onclick="moverIzq()" style="width: 45%; display:inline-block; background:#ff0055;">Izquierda</button>
-            <button onclick="disparar()" style="width: 45%; display:inline-block; background:#ff0055;">Disparar</button>
-            <button onclick="moverDer()" style="width: 92%; margin-top:5px; background:#ff0055;">Derecha</button>
-        </div>
-    </div>
-    <!-- ========================================================= -->
-    <!-- ⬆️ FIN DE LA ZONA DE PRUEBAS ⬆️ -->
-    <!-- ========================================================= -->
-
 
     <script>
-        // Cargar los puntos automáticamente desde el servidor al abrir la web
+        let passwordGlobal = "";
+
         window.onload = function() {
+            cargarPuntos();
+        };
+
+        function cargarPuntos() {
             fetch('/api/puntos')
                 .then(res => res.json())
                 .then(data => {
@@ -149,105 +79,59 @@
                 .catch(err => {
                     document.getElementById('cuerpo-tabla').innerHTML = '<tr><td colspan="2">Error al cargar datos</td></tr>';
                 });
-        };
+        }
 
-        function filtrarTabla() {
-            let input = document.getElementById('buscador');
-            let filtro = input.value.toLowerCase();
-            let tabla = document.getElementById('tabla-usuarios');
-            let filas = tabla.getElementsByTagName('tr');
-
-            for (let i = 1; i < filas.length; i++) {
-                let celdaUsuario = filas[i].getElementsByTagName('td')[0];
-                if (celdaUsuario) {
-                    let textoValor = celdaUsuario.textContent || celdaUsuario.innerText;
-                    if (textoValor.toLowerCase().indexOf(filtro) > -1) {
-                        filas[i].style.display = "";
-                    } else {
-                        filas[i].style.display = "none";
-                    }
-                }
+        function pedirAcceso() {
+            let pass = prompt("Introduce la contraseña de Owner:");
+            if (pass === "#J") {
+                passwordGlobal = pass;
+                document.getElementById('panelAdmin').style.display = "block";
+                alert("¡Acceso concedido! Panel de administración abierto abajo.");
+            } else if (pass !== null) {
+                alert("Contraseña incorrecta.");
             }
         }
 
-        function generarYEnviarCanje() {
-            let usuario = document.getElementById('usuario').value.trim();
-            let premioSeleccionado = document.getElementById('select').value;
-            let aviso = document.getElementById('mensaje-copiado');
-
-            if (usuario === "") {
-                alert("Por favor, escribe tu usuario antes de canjear.");
-                return;
-            }
-
-            let textoMensaje = `Hola Owner, soy *${usuario}* y quiero canjear mis puntos por: *${premioSeleccionado}*.`;
-            let numeroOwner = "TU_NUMERO_DE_TELEFONO"; 
-            let urlWhatsApp = `https://wa.me/${numeroOwner}?text=` + encodeURIComponent(textoMensaje);
-
-            aviso.innerText = "¡Redirigiendo a WhatsApp con tu solicitud!";
+        function ejecutar(accion) {
+            let targetUser = document.getElementById('targetUser').value;
+            let nuevoNombre = document.getElementById('nuevoNombre').value;
+            let nuevosPuntos = document.getElementById('nuevosPuntos').value;
             
-            setTimeout(() => {
-                window.location.href = urlWhatsApp;
-            }, 500);
-        }
+            let addNombre = document.getElementById('addNombre').value;
+            let addPuntos = document.getElementById('addPuntos').value;
 
-        // --- SCRIPTS DEL JUEGO PRUEBA ---
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
+            let datos = { password: passwordGlobal, accion };
 
-        let playerX = 130;
-        let bullets = [];
-        let enemies = [{x: 100, y: 20, width: 25, height: 25, speed: 1}];
-        let scoreJuego = 0;
+            if(accion === 'agregar') {
+                datos.nuevoNombre = addNombre;
+                datos.nuevosPuntos = addPuntos;
+            } else {
+                datos.usuarioMeta = targetUser;
+                datos.nuevoNombre = nuevoNombre;
+                datos.nuevosPuntos = nuevosPuntos;
+            }
 
-        function moverIzq() { if(playerX > 10) playerX -= 15; }
-        function moverDer() { if(playerX < canvas.width - 40) playerX += 15; }
-        function disparar() { bullets.push({x: playerX + 18, y: 300, width: 4, height: 10}); }
-
-        function actualizarJuego() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Jugador
-            ctx.fillStyle = "#001240";
-            ctx.fillRect(playerX, 310, 35, 15);
-
-            // Balas
-            ctx.fillStyle = "#ff0055";
-            bullets.forEach((b, index) => {
-                b.y -= 5;
-                ctx.fillRect(b.x, b.y, b.width, b.height);
-                if(b.y < 0) bullets.splice(index, 1);
+            fetch('/api/admin/actualizar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    alert("¡Modificación aplicada con éxito!");
+                    cargarPuntos();
+                    // Limpiar campos
+                    document.getElementById('targetUser').value = "";
+                    document.getElementById('nuevoNombre').value = "";
+                    document.getElementById('nuevosPuntos').value = "";
+                    document.getElementById('addNombre').value = "";
+                    document.getElementById('addPuntos').value = "";
+                }
             });
-
-            // Enemigos
-            ctx.fillStyle = "#000";
-            enemies.forEach((e, eIndex) => {
-                e.y += e.speed;
-                ctx.fillRect(e.x, e.y, e.width, e.height);
-
-                // Colisión
-                bullets.forEach((b, bIndex) => {
-                    if(b.x < e.x + e.width && b.x + b.width > e.x && b.y < e.y + e.height && b.y + b.height > e.y) {
-                        enemies.splice(eIndex, 1);
-                        bullets.splice(bIndex, 1);
-                        scoreJuego += 10;
-                        // Respawnear enemigo
-                        enemies.push({x: Math.random() * 250, y: 0, width: 25, height: 25, speed: 1.2});
-                    }
-                });
-
-                if(e.y > canvas.height) e.y = 0;
-            });
-
-            // Texto Puntos Juego
-            ctx.fillStyle = "#001240";
-            ctx.font = "12px monospace";
-            ctx.fillText("Score MiniJuego: " + scoreJuego, 10, 20);
-
-            requestAnimationFrame(actualizarJuego);
         }
-
-        actualizarJuego();
     </script>
 
 </body>
