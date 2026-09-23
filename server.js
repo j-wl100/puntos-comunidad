@@ -6,12 +6,13 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Base de datos de ejemplo en memoria
 let usuarios = [
     { usuario: "@usuario_activo", puntos: 500, ultimaActividad: new Date() },
     { usuario: "@usuario_nuevo", puntos: 40, ultimaActividad: new Date() }
 ];
 
-// Limpieza automática por inactividad
+// --- SISTEMA AUTOMÁTICO DE EXPIRACIÓN DE PUNTOS ---
 setInterval(() => {
     const ahora = new Date();
     usuarios = usuarios.filter(user => {
@@ -22,13 +23,16 @@ setInterval(() => {
     });
 }, 1000 * 60 * 60 * 24);
 
+// API para leer los puntos
 app.get('/api/puntos', (req, res) => {
     res.json(usuarios);
 });
 
+// API protegida para modificar/agregar/eliminar usuarios con la contraseña
 app.post('/api/admin/actualizar', (req, res) => {
     const { password, accion, usuarioMeta, nuevoNombre, nuevosPuntos } = req.body;
     
+    // Contraseña de acceso (puedes cambiarla aquí cuando quieras)
     if (password !== "#J") {
         return res.status(401).json({ error: "Contraseña incorrecta" });
     }
@@ -49,6 +53,7 @@ app.post('/api/admin/actualizar', (req, res) => {
     res.json({ success: true, usuarios });
 });
 
+// Ruta principal (Carga index.html directamente desde la raíz)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
