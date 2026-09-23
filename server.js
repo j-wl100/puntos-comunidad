@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Base de datos de ejemplo en memoria
+// Base de datos de usuarios
 let usuarios = [
     { usuario: "@usuario_activo", puntos: 500, ultimaActividad: new Date() },
     { usuario: "@usuario_nuevo", puntos: 40, ultimaActividad: new Date() }
@@ -28,11 +28,10 @@ app.get('/api/puntos', (req, res) => {
     res.json(usuarios);
 });
 
-// API protegida para modificar/agregar/eliminar usuarios con la contraseña
+// API protegida para administrar con la contraseña
 app.post('/api/admin/actualizar', (req, res) => {
     const { password, accion, usuarioMeta, nuevoNombre, nuevosPuntos } = req.body;
     
-    // Contraseña de acceso (puedes cambiarla aquí cuando quieras)
     if (password !== "#J") {
         return res.status(401).json({ error: "Contraseña incorrecta" });
     }
@@ -53,7 +52,7 @@ app.post('/api/admin/actualizar', (req, res) => {
     res.json({ success: true, usuarios });
 });
 
-// Ruta principal (Carga index.html directamente desde la raíz)
+// Cargar index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
