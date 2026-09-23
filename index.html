@@ -35,11 +35,11 @@
             </tbody>
         </table>
         
-        <!-- Botón discreto para activar el modo admin -->
+        <!-- Botón discreto para activar el panel con contraseña -->
         <button onclick="pedirAcceso()" style="background: transparent; color: #666; border: 1px dashed #ccc; font-size: 0.7rem; margin-top: 20px;">Modo Owner</button>
     </div>
 
-    <!-- PANEL DE ADMINISTRACIÓN OCULTO (Se abre con #J) -->
+    <!-- PANEL DE ADMINISTRACIÓN OCULTO -->
     <div class="box admin-panel" id="panelAdmin">
         <h2>PANEL OWNER</h2>
         <p style="font-size: 0.8rem;">Gestionando datos internos:</p>
@@ -86,7 +86,7 @@
             if (pass === "#J") {
                 passwordGlobal = pass;
                 document.getElementById('panelAdmin').style.display = "block";
-                alert("¡Acceso concedido! Panel de administración abierto abajo.");
+                alert("¡Acceso concedido! Panel abierto abajo.");
             } else if (pass !== null) {
                 alert("Contraseña incorrecta.");
             }
@@ -123,7 +123,6 @@
                 } else {
                     alert("¡Modificación aplicada con éxito!");
                     cargarPuntos();
-                    // Limpiar campos
                     document.getElementById('targetUser').value = "";
                     document.getElementById('nuevoNombre').value = "";
                     document.getElementById('nuevosPuntos').value = "";
