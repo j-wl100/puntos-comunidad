@@ -5,8 +5,17 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static('public'));
 
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
+// Base de datos de puntos de la comunidad
+let puntosComunidad = [
+    { usuario: "UsuarioEjemplo1", puntos: 150 },
+    { usuario: "UsuarioEjemplo2", puntos: 80 },
+    { usuario: "UsuarioEjemplo3", puntos: 300 },
+    { usuario: "CyberUser", puntos: 450 }
+];
+
+// Ruta para que la web obtenga los puntos actualizados
+app.get('/api/puntos', (req, res) => {
+    res.json(puntosComunidad);
 });
 
 app.listen(PORT, () => {
