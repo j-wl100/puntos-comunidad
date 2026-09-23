@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZENITH - Puntos y Canjes</title>
+    <style>
+        body { background: #fff; color: #000; font-family: monospace, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+        .box { border: 1px solid #001240; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        h2 { border-bottom: 2px solid #001240; padding-bottom: 8px; color: #001240; font-size: 1.2rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #e5e7eb; font-size: 0.9rem; }
+        th { color: #001240; }
+        input, button { width: 100%; padding: 10px; margin-top: 8px; background: #fff; border: 1px solid #001240; color: #000; border-radius: 5px; box-sizing: border-box; font-family: monospace; }
+        button { background: #001240; color: #fff; cursor: pointer; border: none; font-weight: bold; }
+        button:hover { background: #002270; }
+        .admin-panel { display: none; background: #f9fafb; border-color: #ff0055; margin-top: 20px; }
+        .admin-panel h2 { color: #ff0055; border-color: #ff0055; }
+    </style>
+</head>
+<body>
+
+    <!-- VISTA NORMAL: LISTA DE PUNTOS -->
+    <div class="box">
+        <h2>LISTA PUNTOS ZENITH</h2>
+        <table id="tabla-usuarios">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Puntos</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpo-tabla">
+                <tr><td colspan="2">Cargando puntos...</td></tr>
+            </tbody>
+        </table>
+        
+        <!-- Botón discreto para activar el modo admin -->
+        <button onclick="pedirAcceso()" style="background: transparent; color: #666; border: 1px dashed #ccc; font-size: 0.7rem; margin-top: 20px;">Modo Owner</button>
+    </div>
+
+    <!-- PANEL DE ADMINISTRACIÓN OCULTO (Se abre con #J) -->
+    <div class="box admin-panel" id="panelAdmin">
+        <h2>PANEL OWNER</h2>
+        <p style="font-size: 0.8rem;">Gestionando datos internos:</p>
+        
+        <label>Modificar Usuario Existente:</label>
+        <input type="text" id="targetUser" placeholder="Usuario exacto (ej: @usuario_activo)">
+        <input type="text" id="nuevoNombre" placeholder="Nuevo nombre (opcional)">
+        <input type="number" id="nuevosPuntos" placeholder="Nuevos puntos (opcional)">
+        <button onclick="ejecutar('editar')">Actualizar Datos</button>
+        <button onclick="ejecutar('eliminar')" style="background:#ff0055; margin-top:5px;">Eliminar Usuario</button>
+
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 15px 0;">
+
+        <label>Agregar Nuevo Usuario:</label>
+        <input type="text" id="addNombre" placeholder="Nombre de usuario">
+        <input type="number" id="addPuntos" placeholder="Puntos iniciales">
+        <button onclick="ejecutar('agregar')">Crear Usuario</button>
+    </div>
+
+    <script>
+        let passwordGlobal = "";
+
+        window.onload = function() {
+            cargarPuntos();
+        };
+
+        function cargarPuntos() {
+            fetch('/api/puntos')
+                .then(res => res.json())
+                .then(data => {
+                    let cuerpoTabla = document.getElementById('cuerpo-tabla');
+                    cuerpoTabla.innerHTML = '';
+                    data.forEach(item => {
+                        cuerpoTabla.innerHTML += `<tr><td>${item.usuario}</td><td>${item.puntos}</td></tr>`;
+                    });
+                })
+                .catch(err => {
+                    document.getElementById('cuerpo-tabla').innerHTML = '<tr><td colspan="2">Error al cargar datos</td></tr>';
+                });
+        }
+
+        function pedirAcceso() {
+            let pass = prompt("Introduce la contraseña de Owner:");
+            if (pass === "#J") {
+                passwordGlobal = pass;
+                document.getElementById('panelAdmin').style.display = "block";
+                alert("¡Acceso concedido! Panel de administración abierto abajo.");
+            } else if (pass !== null) {
+                alert("Contraseña incorrecta.");
+            }
+        }
+
+        function ejecutar(accion) {
+            let targetUser = document.getElementById('targetUser').value;
+            let nuevoNombre = document.getElementById('nuevoNombre').value;
+            let nuevosPuntos = document.getElementById('nuevosPuntos').value;
+            
+            let addNombre = document.getElementById('addNombre').value;
+            let addPuntos = document.getElementById('addPuntos').value;
+
+            let datos = { password: passwordGlobal, accion };
+
+            if(accion === 'agregar') {
+                datos.nuevoNombre = addNombre;
+                datos.nuevosPuntos = addPuntos;
+            } else {
+                datos.usuarioMeta = targetUser;
+                datos.nuevoNombre = nuevoNombre;
+                datos.nuevosPuntos = nuevosPuntos;
+            }
+
+            fetch('/api/admin/actualizar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    alert("¡Modificación aplicada con éxito!");
+                    cargarPuntos();
+                    // Limpiar campos
+                    document.getElementById('targetUser').value = "";
+                    document.getElementById('nuevoNombre').value = "";
+                    document.getElementById('nuevosPuntos').value = "";
+                    document.getElementById('addNombre').value = "";
+                    document.getElementById('addPuntos').value = "";
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
