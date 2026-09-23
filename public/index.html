@@ -3,36 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puntos de la Comunidad</title>
+    <title>Puntos y Canjes - Comunidad</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
+            background-color: #ffffff;
+            color: #000000;
+            font-family: monospace, sans-serif;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
         }
-        .card {
-            background-color: #1e293b;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        h2 {
+            border-bottom: 2px solid #001240;
+            padding-bottom: 8px;
+            color: #001240;
+            font-size: 1.2rem;
+        }
+        .box {
+            background: #ffffff;
+            border: 1px solid #001240;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        label {
+            color: #001240;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: #ffffff;
+            border: 1px solid #001240;
+            color: #000000;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #001240;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+            color: #000000;
+        }
+        th {
+            color: #001240;
+        }
+        button {
+            background: #001240;
+            color: #ffffff;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background: #002270;
+        }
+        #mensaje-copiado {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #001240;
             text-align: center;
-            max-width: 400px;
-            width: 90%;
         }
-        h1 { color: #38bdf8; font-size: 24px; margin-bottom: 10px; }
-        p { color: #94a3b8; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>ZENITH Puntos</h1>
-        <p>Sistema de puntos de la comunidad activo y funcionando correctamente.</p>
+
+    <!-- ZONA 1: TABLA DE PUNTOS CON BUSCADOR -->
+    <div class="box">
+        <h2>LISTA PUNTOS</h2>
+        <input type="text" id="buscador" placeholder="Buscar usuario..." onkeyup="filtrarTabla()">
+        
+        <table id="tabla-usuarios">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Puntos</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpo-tabla">
+                <tr><td colspan="2">Cargando puntos...</td></tr>
+            </tbody>
+        </table>
     </div>
+
+    <!-- ZONA 2: ZONA DE CANJE -->
+    <div class="box">
+        <h2>ZONA DE CANJE</h2>
+        <label for="usuario">Tu usuario:</label>
+        <input type="text" id="usuario" placeholder="Escribe tu nombre aquí...">
+
+        <label for="select" style="display:block; margin-top:10px;">Selecciona canje:</label>
+        <select id="select">
+            <option value="Promoción de arte (100 Pts)">Promoción de arte - 100 Pts</option>
+            <option value="Quitar 1 advertencia (250 Pts)">Quitar 1 advertencia - 250 Pts</option>
+            <option value="Quitar 2 advertencias (470 Pts)">Quitar 2 advertencias - 470 Pts</option>
+        </select>
+
+        <button onclick="generarYEnviarCanje()">Canjear y Enviar al Owner</button>
+        <div id="mensaje-copiado"></div>
+    </div>
+
+    <script>
+        // Cargar los puntos automáticamente desde el servidor al abrir la web
+        window.onload = function() {
+            fetch('/api/puntos')
+                .then(res => res.json())
+                .then(data => {
+                    let cuerpoTabla = document.getElementById('cuerpo-tabla');
+                    cuerpoTabla.innerHTML = '';
+                    data.forEach(item => {
+                        cuerpoTabla.innerHTML += `<tr><td>${item.usuario}</td><td>${item.puntos}</td></tr>`;
+                    });
+                })
+                .catch(err => {
+                    document.getElementById('cuerpo-tabla').innerHTML = '<tr><td colspan="2">Error al cargar datos</td></tr>';
+                });
+        };
+
+        function filtrarTabla() {
+            let input = document.getElementById('buscador');
+            let filtro = input.value.toLowerCase();
+            let tabla = document.getElementById('tabla-usuarios');
+            let filas = tabla.getElementsByTagName('tr');
+
+            for (let i = 1; i < filas.length; i++) {
+                let celdaUsuario = filas[i].getElementsByTagName('td')[0];
+                if (celdaUsuario) {
+                    let textoValor = celdaUsuario.textContent || celdaUsuario.innerText;
+                    if (textoValor.toLowerCase().indexOf(filtro) > -1) {
+                        filas[i].style.display = "";
+                    } else {
+                        filas[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        function generarYEnviarCanje() {
+            let usuario = document.getElementById('usuario').value.trim();
+            let premioSeleccionado = document.getElementById('select').value;
+            let aviso = document.getElementById('mensaje-copiado');
+
+            if (usuario === "") {
+                alert("Por favor, escribe tu usuario antes de canjear.");
+                return;
+            }
+
+            let textoMensaje = `Hola Owner, soy *${usuario}* y quiero canjear mis puntos por: *${premioSeleccionado}*.`;
+            let numeroOwner = "TU_NUMERO_DE_TELEFONO"; 
+            let urlWhatsApp = `https://wa.me/${numeroOwner}?text=` + encodeURIComponent(textoMensaje);
+
+            aviso.innerText = "¡Redirigiendo a WhatsApp con tu solicitud!";
+            
+            setTimeout(() => {
+                window.location.href = urlWhatsApp;
+            }, 500);
+        }
+    </script>
+
 </body>
 </html>
