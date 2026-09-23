@@ -4,9 +4,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// Ruta de prueba para verificar que el servidor está activo
+// Esto le dice a Express que lea archivos estáticos de una carpeta llamada 'public'
+app.use(express.static('public'));
+
+// Ruta principal por si acaso
 app.get('/', (req, res) => {
-    res.send('Servidor de puntos de la comunidad activo y funcionando.');
+    res.sendFile(__dirname + '/public/index.html');
 });
 
 app.listen(PORT, () => {
